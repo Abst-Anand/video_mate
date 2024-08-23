@@ -21,3 +21,8 @@ connectDB()
     console.log("Error in connection ", err);
     
 })
+
+//import routes
+import userRoute from "./routes/user.routes.js"
+
+app.use("/api/v1/users", userRoute)
