@@ -44,7 +44,7 @@ node_modules/
 jspm_packages/
 
 # Temp directory with local files uploads
-public/temp/
+# public/temp/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
