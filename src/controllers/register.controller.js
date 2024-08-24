@@ -33,9 +33,14 @@ const registerUser = async (req, res) => {
   }
 
   //check for files from frontend
-  console.log(req.files)
+  // console.log(req.files)
   const avatarLocalPath = req.files?.avatar[0]?.path
-  const coverImageLocalPath = req.files?.coverImage[0]?.path
+  // let coverImageLocalPath = req.files?.coverImage[0]?.path //TypeError: Cannot read properties of undefined (reading '0')
+
+  let coverImageLocalPath
+  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+    coverImageLocalPath = req.files.coverImage[0].path
+  }
 
   if(!avatarLocalPath){
     throw new ApiError(400,"Avatar File is required")
@@ -65,6 +70,8 @@ const registerUser = async (req, res) => {
   if(!createdUser){
     throw new ApiError(500,"Something went wrong while registering the user")
   }
+
+  console.log("User registered successfully")
 
   return res.status(201).json(
     new ApiResponse(200,createdUser,"User registered successfully")
