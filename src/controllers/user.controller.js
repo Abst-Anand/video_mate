@@ -211,4 +211,78 @@ const refreshAccessToken = async(req,res)=>{
 
 }
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const changeCurrentPassword = async(req, res)=>{
+  //get oldPassword, newPassword
+  //get user from req.user (added by auth.middleware) or refreshToken
+  //verify oldPassword from db
+  //modify oldPassword with newPassword
+  //return res
+
+  const { oldPassword, newPassword, confirmNewPassword } = req.body
+
+  if(newPassword != confirmNewPassword){
+    throw new ApiError(400, "New Password and Confirm New Password must be same")
+  }
+
+  if(oldPassword === newPassword){
+    throw new ApiError(400, "Old Password and New Password are same")
+  }
+
+  try {
+    
+    const user = await User.findById(req.user._id)
+  
+    if(!user){
+      throw new ApiError(400,"Unauthorized Request")
+    }
+
+    const isPasswordValid = await user.checkUserPassword(oldPassword)
+    if(!isPasswordValid){
+      throw new ApiError(400, "Invalid Old Password") 
+    }
+
+
+    user.password = newPassword
+    await user.save({validateBeforeSave:false})
+
+    console.log("Password Updated Successfully")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200,{},"Password Updated Successfully"))
+
+
+  } catch (error) {
+    throw new ApiError(400,error?.message || "Unauthorized Request")
+  }
+
+
+}
+
+const getCurrentUser = (req,res)=>{
+  return res
+  .status(200)
+  .json(new ApiResponse(200,req.user,"Current User Fetched Successfully"))
+
+}
+
+
+const updateAccountDetails = async(req,res) =>{
+  
+  const {fullName} = req.body // only fullName changeable for now
+
+  if(!fullName){
+    throw new ApiError(400,"Fullname is requries")
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(req.user?._id,{$set:{fullName}},{new:true}).select("-password")
+
+  if(!updatedUser){
+    throw new ApiError(400,"User Not Found")
+  }
+  return res
+  .status(200)
+  .json(new ApiResponse(200,updatedUser,"Account Details Updated Successfully"))
+}
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails };
