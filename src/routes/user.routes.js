@@ -1,4 +1,4 @@
-import { loginUser, logoutUser, registerUser } from "../controllers/register.controller.js";
+import { loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { Router } from "express";
@@ -19,7 +19,9 @@ router.route("/register").post(upload.fields([
 
 router.route("/login").post(loginUser)
 
+//secured routes => user should be loggedIn
 router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/refresh-token").post(refreshAccessToken)
 
 
 export default router
